@@ -4,7 +4,7 @@ Controls Hitachi broadcast cameras through their CCU's TCP control port (default
 Hitachi RCP uses. One connection per CCU. Developed against a **Z-HD5500 head / CU-HD1500 CCU / CA-HF1300STD adapter**,
 using packet captures of a real RCP plus the DK-H200 command list (a sibling model).
 
-> The CCU control port has **no authentication** and accepts **one client at a time**. Keep it on a trusted lab network
+> The CCU control port has **no authentication** and accepts the RCP plus **one remote client**. Keep it on a trusted lab network
 > and do not point two controllers (e.g. Companion and a script) at the same CCU.
 
 ## Features
@@ -21,7 +21,7 @@ using packet captures of a real RCP plus the DK-H200 command list (a sibling mod
 Presets (Companion 5 layered buttons): status buttons, IRIS + BLACK gauges, and StreamDeck+ knob presets (see [companion/HELP.md](companion/HELP.md)).
 
 Planned: gain, gamma, flare, detail, V. color temp, master gain, bars, test pattern, masking, skin detail, call,
-ext chart, shutter. See [TODO.md](TODO.md). All wire frames and their evidence level: [docs/PROTOCOL.md](docs/PROTOCOL.md).
+ext chart, shutter. See [TODO.md](TODO.md). All wire frames and their evidence level: [docs/PROTOCOL.md](docs/PROTOCOL.md); how the protocol behaved in our tests: [docs/OBSERVED-USAGE.md](docs/OBSERVED-USAGE.md).
 Usage and variables: [companion/HELP.md](companion/HELP.md).
 
 ## Which branch / version

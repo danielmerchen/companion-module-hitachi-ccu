@@ -43,7 +43,7 @@ On/off writes and power need no claim (CAP, HW for power).
 | IRIS mode | on/off `04` bits 0-1: 0 = REMOTE, 2 = AUTO | CAP |
 | Auto black | `40 20` -> `40 00 00` after ~19 s (CAP ON closes iris, then `0A 03 00`) | CAP |
 | Auto white | `40 10` | DOC |
-| Bars | `20 08 01 EE` / `20 08 00 EE` (echo `22 08 01/00`) | CAP |
+| Bars | `20 08 01 EE` / `20 08 00 EE` (echo `22 08 01/00`; read `23 08`) | CAP; off verified on four cameras (HW) |
 | Test pattern | `20 09 08 F7` / `20 09 00 F7` | CAP |
 | Masking | `20 02 80 3F` / `20 02 00 3F` | CAP |
 | Skin detail | `20 06 01 FE` / `20 06 00 FE` | CAP |
@@ -57,6 +57,7 @@ On/off writes and power need no claim (CAP, HW for power).
 | Flare R/G/B | analog `06` / `07` / `08` | CAP |
 | Detail | analog `2C` | CAP |
 | V. color temp | analog `D4`, relative steps `0100` / `FF00` (reads back `0000`) | CAP |
+| Fiber link | read `23 50` -> `22 50 xx` and `13 0F` -> `12 0F xx`: `11`/`00` OK, `10`/`00` one half, `80`/`20` down (see [OBSERVED-USAGE.md](OBSERVED-USAGE.md)) | HW (not in the PDF) |
 | Extender | `22 12`: bit 0 = x2, bit 1 = x0.8 | DOC |
 | Head alarm | `12 13`: `01` fan, `02` temperature | DOC |
 
@@ -68,5 +69,7 @@ not documented or captured. Auto functions only behind the 5 s hold latch.
 ## Behaviour notes
 
 - Power off is immediate; power on appears in the readback after ~1.3 s; an on sent ~5 s after an off was ignored (wait ~8 s).
-- The CCU accepts one TCP client at a time; a second connection is refused.
+- The CCU accepts the RCP plus **one** remote client; a second remote connection is refused (`ECONNREFUSED`). HW.
 - The RCP re-reads IRIS and master black only at resync events; it never polls them.
+
+More detail, timelines and the tests behind these rules: [OBSERVED-USAGE.md](OBSERVED-USAGE.md).
