@@ -1,0 +1,37 @@
+{
+	"$schema": "../node_modules/@companion-module/base/assets/manifest.schema.json",
+	"id": "hitachi-ccu",
+	"name": "hitachi-ccu",
+	"shortname": "CCU",
+	"description": "Control Hitachi broadcast camera CCUs over the CCU control port: power, IRIS / f-stop, master black, readback, alarms and latched auto functions",
+	"version": "0.10.0",
+	"license": "MIT",
+	"repository": "git+https://github.com/danielmerchen/companion-module-hitachi-ccu.git",
+	"bugs": "https://github.com/danielmerchen/companion-module-hitachi-ccu/issues",
+	"maintainers": [
+		{
+			"name": "Daniel Merchen",
+			"email": "github@danielmerchen.com"
+		}
+	],
+	"legacyIds": [],
+	"runtime": {
+		"type": "node22",
+		"api": "nodejs-ipc",
+		"apiVersion": "0.0.0",
+		"entrypoint": "../main.js"
+	},
+	"manufacturer": "Hitachi",
+	"products": [
+		"Camera CCU"
+	],
+	"keywords": [
+		"camera",
+		"broadcast",
+		"CCU",
+		"RCP",
+		"iris",
+		"black"
+	],
+	"type": "connection"
+}
