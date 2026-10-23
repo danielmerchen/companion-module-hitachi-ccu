@@ -1,6 +1,7 @@
 # To do
 
 ## Build (frames captured from a real RCP, 2026-10-05)
+
 - [ ] Gain R/G/B (analog `00`-`02`), gamma R/G/B (`03`-`05`), flare R/G/B (`06`-`08`), detail (`2C`); detent = `0x40`, 16-bit values
 - [ ] V. color temp (`D4`, relative step: `30 D4 01 00` / `30 D4 FF 00`, knob on the RCP)
 - [ ] Master gain (`20 01 V 00`), bars, test pattern, masking, skin detail, camera call, ext chart (detect gate `20 19`)
@@ -9,6 +10,7 @@
 - [ ] Gain/IRIS/MB at full 16-bit (quarter-step) resolution
 
 ## Capture first
+
 - [ ] Auto white (`40 10`) and auto setup on the RCP (white card needed)
 - [ ] Shutter: every preset step, variable and angle
 - [ ] Ext chart: confirm gray / skin / white-shading states vs RCP buttons
@@ -16,10 +18,12 @@
 - [ ] Verify on hardware: extender and alarm replies with the condition active
 
 ## Platforms
+
 - [x] Companion v2 module API port (`main`, v0.6.0); `v1` branch kept for reference only
 - [x] `v1` is no longer maintained (decision 2026-10-06); `main` only
 - [ ] **Q-SYS control plugin** (Lua) exposing the same controls for Q-SYS Designer
 
 ## Presets (v0.7.0)
+
 - [ ] Tune the layered preset styling (gauge colours, font sizes, bounds) in a real Companion 5; they could not be previewed outside Companion
 - [ ] StreamDeck+ push-to-change-sensitivity (needs local-variable toggling) if wanted

@@ -5,7 +5,19 @@ import * as P from '../protocol.js'
 
 class MockCcu {
 	constructor(opts = {}) {
-		this.state = { power: true, iris: 0, masterBlack: -13, irisFollow: 0x003d, irisModeRaw: 0x04, extender: 0, camAlarm: 0, fiberBits: 0x11, linkStatus: 0x00, autoCode: 0x00, ...opts.state }
+		this.state = {
+			power: true,
+			iris: 0,
+			masterBlack: -13,
+			irisFollow: 0x003d,
+			irisModeRaw: 0x04,
+			extender: 0,
+			camAlarm: 0,
+			fiberBits: 0x11,
+			linkStatus: 0x00,
+			autoCode: 0x00,
+			...opts.state,
+		}
 		this.silent = !!opts.silent
 		// Lens: the settled position for an IRIS command (units), and how fast it gets there (follow units per 50 ms; 0 = instantly).
 		this.lensCurve = opts.lensCurve ?? ((i) => Math.max(18, Math.round(61 - 0.4 * i)))
@@ -81,7 +93,13 @@ class MockCcu {
 		const key = dt.toString('hex')
 		const sbyte = (v) => v & 0xff
 		if (key === '2322') this._reply(sock, [0x22, 0x22, s.power ? 1 : 0])
-		else if (key === '332e') this._reply(sock, [0x32, 0x2e, (Math.round(this.iris16 * 256) & 0xffff) >> 8, Math.round(this.iris16 * 256) & 0xff])
+		else if (key === '332e')
+			this._reply(sock, [
+				0x32,
+				0x2e,
+				(Math.round(this.iris16 * 256) & 0xffff) >> 8,
+				Math.round(this.iris16 * 256) & 0xff,
+			])
 		else if (key === '332b') this._reply(sock, [0x32, 0x2b, sbyte(s.masterBlack), 0x00])
 		else if (key === '1322') this._reply(sock, [0x12, 0x22, s.irisFollow >> 8, s.irisFollow & 0xff])
 		else if (key === '2304') this._reply(sock, [0x22, 0x04, s.irisModeRaw])
@@ -103,8 +121,7 @@ class MockCcu {
 			this.iris16 = (u >= 0x8000 ? u - 0x10000 : u) / 256 // upper byte whole units, lower byte quarter steps
 			s.iris = P.toSigned8(dt[2])
 			this._moveLens(this.lensCurve(this.iris16))
-		}
-		else if (dt[0] === 0x30 && dt[1] === 0x2b && sock.analogOk) s.masterBlack = P.toSigned8(dt[2])
+		} else if (dt[0] === 0x30 && dt[1] === 0x2b && sock.analogOk) s.masterBlack = P.toSigned8(dt[2])
 	}
 }
 

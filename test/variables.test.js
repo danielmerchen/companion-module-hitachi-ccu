@@ -38,7 +38,11 @@ test('irisGaugePct is linear in stops: 100 wide open, 0 at the smallest aperture
 	assert.equal(irisGaugePct(10), 100, 'wider than the configured wide-open clamps')
 	assert.equal(irisGaugePct(0xffff), 0)
 	assert.equal(irisGaugePct(null), 0)
-	assert.equal(irisGaugePct(40, 1.4, 16), Math.round((1 - Math.log2(4 / 1.4) / Math.log2(16 / 1.4)) * 100), 'honours the configured lens limits')
+	assert.equal(
+		irisGaugePct(40, 1.4, 16),
+		Math.round((1 - Math.log2(4 / 1.4) / Math.log2(16 / 1.4)) * 100),
+		'honours the configured lens limits',
+	)
 	assert.equal(irisGaugePct(40, 22, 1.8), 0, 'nonsense limits do not throw')
 })
 

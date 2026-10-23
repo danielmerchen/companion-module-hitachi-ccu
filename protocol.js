@@ -14,7 +14,11 @@ function buildFrame(dt) {
 	const n = dt.length & 0xff // 256 bytes would encode as 0; never needed here
 	const comp = ~(n + dt.reduce((a, b) => a + b, 0)) & 0xffff
 	const raw = Buffer.from([n, ...dt, comp & 0xff, comp >> 8])
-	return Buffer.concat([Buffer.from([STX]), Buffer.from(raw.toString('hex').toUpperCase(), 'ascii'), Buffer.from([ETX])])
+	return Buffer.concat([
+		Buffer.from([STX]),
+		Buffer.from(raw.toString('hex').toUpperCase(), 'ascii'),
+		Buffer.from([ETX]),
+	])
 }
 
 /** Stateful parser: feed it TCP chunks, get back checksum-valid DT payloads. */
@@ -60,7 +64,6 @@ function decodeBody(body) {
 }
 
 const toSigned8 = (b) => (b & 0x80 ? b - 256 : b)
-const fromSigned8 = (v) => v & 0xff
 
 // --- Mode numbers (CTL 30/33/32 analog, CTL 20/23/22 on-off, CTL 13/12 status)
 const MODE = {

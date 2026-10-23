@@ -73,7 +73,7 @@ test('setFstop closes the loop on the lens position and lands exactly on the tar
 })
 
 test('stepFstop is relative to the current f-number, and steps queue in order', async () => {
-	const { ccu, client, done } = await setup({}, { fstopMinMs: 40, fstopPollMs: 30 })
+	const { client, done } = await setup({}, { fstopMinMs: 40, fstopPollMs: 30 })
 	await waitFor(() => client.state.irisMode !== null && client.state.irisFollow !== null)
 	await client.setFstop(4)
 	near(await client.stepFstop(1), 5.7)
@@ -100,32 +100,49 @@ test('setFstop refuses outside REMOTE mode, out of range, or with no lens', asyn
 
 // A lens like the real one: non-linear, and it lags the command. Counts how many IRIS commands each move needed.
 const realisticLens = (extra = {}) => ({
-	lensCurve: (i) => Math.round(18 + Math.max(0, 66 - i) * 0.32 + Math.max(0, 14 - i) * 0.35 + Math.max(0, -13 - i) * 0.9 + Math.max(0, -42 - i) * 0.5),
+	lensCurve: (i) =>
+		Math.round(
+			18 +
+				Math.max(0, 66 - i) * 0.32 +
+				Math.max(0, 14 - i) * 0.35 +
+				Math.max(0, -13 - i) * 0.9 +
+				Math.max(0, -42 - i) * 0.5,
+		),
 	lensSlew: 4,
 	...extra,
 })
 const near = (a, b, m) => assert.ok(Math.abs(a - b) < 0.11, `${m ?? ''} ${a} vs ${b}`)
 const irisCmds = (ccu) => ccu.received.filter((r) => r[0] === 0x30 && r[1] === 0x2e).length
 
-test('f-stop moves on a lagging, non-linear lens take few commands, land exactly, and do not hunt', { timeout: 60000 }, async () => {
-	const { ccu, client, done } = await setup({ state: { irisFollow: 61 }, ...realisticLens() }, { fstopMinMs: 120, fstopPollMs: 50 })
-	await waitFor(() => client.state.irisMode !== null && client.state.irisFollow !== null)
-	for (const f of [2.8, 10, 4, 16, 5.6, 8, 3.3]) {
-		const before = irisCmds(ccu)
-		const seen = []
-		const onChange = (keys, st) => keys.includes('irisFollow') && seen.push(st.irisFollow)
-		client.on('change', onChange)
-		near(await client.setFstop(f), f, `f/${f}`)
-		client.off('change', onChange)
-		assert.ok(Math.abs(ccu.state.irisFollow - f * 10) <= 1, `f/${f} landed at ${ccu.state.irisFollow}`)
-		assert.ok(irisCmds(ccu) - before <= 5, `f/${f} took ${irisCmds(ccu) - before} commands`)
-	}
-	await done()
-})
+test(
+	'f-stop moves on a lagging, non-linear lens take few commands, land exactly, and do not hunt',
+	{ timeout: 60000 },
+	async () => {
+		const { ccu, client, done } = await setup(
+			{ state: { irisFollow: 61 }, ...realisticLens() },
+			{ fstopMinMs: 120, fstopPollMs: 50 },
+		)
+		await waitFor(() => client.state.irisMode !== null && client.state.irisFollow !== null)
+		for (const f of [2.8, 10, 4, 16, 5.6, 8, 3.3]) {
+			const before = irisCmds(ccu)
+			const seen = []
+			const onChange = (keys, st) => keys.includes('irisFollow') && seen.push(st.irisFollow)
+			client.on('change', onChange)
+			near(await client.setFstop(f), f, `f/${f}`)
+			client.off('change', onChange)
+			assert.ok(Math.abs(ccu.state.irisFollow - f * 10) <= 1, `f/${f} landed at ${ccu.state.irisFollow}`)
+			assert.ok(irisCmds(ccu) - before <= 5, `f/${f} took ${irisCmds(ccu) - before} commands`)
+		}
+		await done()
+	},
+)
 
 test('the learned curve makes the second move to the same place a single command', { timeout: 30000 }, async () => {
 	const shifted = (i) => Math.round(30 + Math.max(0, 40 - i) * 0.5 + Math.max(0, -10 - i) * 1.2) // a lens unlike the seed
-	const { ccu, client, done } = await setup({ state: { irisFollow: 61 }, lensCurve: shifted, lensSlew: 6 }, { fstopMinMs: 100, fstopPollMs: 40 })
+	const { ccu, client, done } = await setup(
+		{ state: { irisFollow: 61 }, lensCurve: shifted, lensSlew: 6 },
+		{ fstopMinMs: 100, fstopPollMs: 40 },
+	)
 	await waitFor(() => client.state.irisMode !== null && client.state.irisFollow !== null)
 	await client.setFstop(5)
 	await client.setFstop(9)
@@ -136,19 +153,26 @@ test('the learned curve makes the second move to the same place a single command
 	await done()
 })
 
-test('a new f-stop request during a move retargets it, and a step uses the in-flight target as its base', { timeout: 30000 }, async () => {
-	const { ccu, client, done } = await setup({ state: { irisFollow: 61 }, ...realisticLens({ lensSlew: 2 }) }, { fstopMinMs: 100, fstopPollMs: 40 })
-	await waitFor(() => client.state.irisMode !== null && client.state.irisFollow !== null)
-	const first = client.setFstop(10)
-	await sleep(200)
-	const second = client.setFstop(3.3) // changes its mind mid-move
-	const third = client.stepFstop(1) // relative to where it is now headed (3.3), not to the lens position
-	const [a, b, c] = await Promise.all([first, second, third])
-	assert.deepEqual([a, b], [c, c])
-	near(c, 4.7, '3.3 + one stop')
-	assert.ok(Math.abs(ccu.state.irisFollow - 47) <= 1)
-	await done()
-})
+test(
+	'a new f-stop request during a move retargets it, and a step uses the in-flight target as its base',
+	{ timeout: 30000 },
+	async () => {
+		const { ccu, client, done } = await setup(
+			{ state: { irisFollow: 61 }, ...realisticLens({ lensSlew: 2 }) },
+			{ fstopMinMs: 100, fstopPollMs: 40 },
+		)
+		await waitFor(() => client.state.irisMode !== null && client.state.irisFollow !== null)
+		const first = client.setFstop(10)
+		await sleep(200)
+		const second = client.setFstop(3.3) // changes its mind mid-move
+		const third = client.stepFstop(1) // relative to where it is now headed (3.3), not to the lens position
+		const [a, b, c] = await Promise.all([first, second, third])
+		assert.deepEqual([a, b], [c, c])
+		near(c, 4.7, '3.3 + one stop')
+		assert.ok(Math.abs(ccu.state.irisFollow - 47) <= 1)
+		await done()
+	},
+)
 
 test('values are clamped to the signed 8-bit range', async () => {
 	const { ccu, client, done } = await setup()
@@ -194,7 +218,7 @@ test('power off is seen immediately; power on shows up after the camera lag', as
 })
 
 test('toggle follows current state and refuses when state is unknown', async () => {
-	const { ccu, client, done } = await setup()
+	const { client, done } = await setup()
 	await waitFor(() => client.state.power === true)
 	client.togglePower()
 	await waitFor(() => client.state.power === false)

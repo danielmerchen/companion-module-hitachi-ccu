@@ -71,14 +71,26 @@ export default function updateActions(self) {
 		},
 		iris_fstop_set: {
 			name: 'IRIS set to f-stop',
-			description: 'Drives the lens to an absolute f-number using the lens-position readback; only effective in REMOTE mode',
+			description:
+				'Drives the lens to an absolute f-number using the lens-position readback; only effective in REMOTE mode',
 			options: [{ id: 'fstop', type: 'number', label: 'f-number', default: 4, min: 1, max: 32, step: 0.1 }],
 			callback: run('IRIS set to f-stop', (c, o) => c.setFstop(Number(o.fstop))),
 		},
 		iris_fstop_step: {
 			name: 'IRIS step f-stop',
-			description: 'Moves the lens relative to its current f-number, in stops (1/3 stop = 0.33); only effective in REMOTE mode',
-			options: [{ id: 'stops', type: 'number', label: 'Stops (positive = close, negative = open)', default: 0.33, min: -6, max: 6, step: 0.01 }],
+			description:
+				'Moves the lens relative to its current f-number, in stops (1/3 stop = 0.33); only effective in REMOTE mode',
+			options: [
+				{
+					id: 'stops',
+					type: 'number',
+					label: 'Stops (positive = close, negative = open)',
+					default: 0.33,
+					min: -6,
+					max: 6,
+					step: 0.01,
+				},
+			],
 			callback: run('IRIS step f-stop', (c, o) => c.stepFstop(Number(o.stops))),
 		},
 		master_black_set: {
@@ -107,7 +119,15 @@ export default function updateActions(self) {
 						{ id: 'abb', label: 'Auto black' },
 					],
 				},
-				{ id: 'holdSeconds', type: 'number', label: 'Hold time (seconds, min 5)', default: 5, min: 5, max: 15, step: 0.5 },
+				{
+					id: 'holdSeconds',
+					type: 'number',
+					label: 'Hold time (seconds, min 5)',
+					default: 5,
+					min: 5,
+					max: 15,
+					step: 0.5,
+				},
 			],
 			callback: (event) => {
 				const fn = AUTO_FUNCTIONS[event.options.fn]
@@ -146,7 +166,10 @@ export default function updateActions(self) {
 				const holdMs = Math.max(1, Number(event.options.holdSeconds) || 3) * 1000
 				const fallback = state === 'toggle' ? 'POWER' : state === 'on' ? 'POWER\nON' : 'POWER\nOFF'
 				self.latch.start(event.controlId, {
-					label: String(event.options.label ?? '').trim().replace(/\\n/g, '\n') || fallback,
+					label:
+						String(event.options.label ?? '')
+							.trim()
+							.replace(/\\n/g, '\n') || fallback,
 					holdMs,
 					fire: () => (state === 'toggle' ? self.client.togglePower() : self.client.power(state === 'on')),
 					lingerMs: 3000,
@@ -177,7 +200,8 @@ export default function updateActions(self) {
 		},
 		auto_hold_cancel: {
 			name: 'Hold: cancel (release)',
-			description: 'Use on the button RELEASE: cancels an auto-function or power hold that has not reached its time yet',
+			description:
+				'Use on the button RELEASE: cancels an auto-function or power hold that has not reached its time yet',
 			options: [],
 			callback: (event) => {
 				self.latch.release(event.controlId)

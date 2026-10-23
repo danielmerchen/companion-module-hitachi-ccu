@@ -3,7 +3,9 @@
 // feedback re-checks, action execution). Companion launches modules from its own runtime, so this is the
 // closest in-process equivalent; it is not a full Companion.
 // MODULE_ENTRY=/path/to/main.js runs the same tests against a packaged build instead of the source.
-const Module = (await import(process.env.MODULE_ENTRY ? new URL(`file://${process.env.MODULE_ENTRY}`).href : '../main.js')).default
+const Module = (
+	await import(process.env.MODULE_ENTRY ? new URL(`file://${process.env.MODULE_ENTRY}`).href : '../main.js')
+).default
 import { sleep } from './mock-ccu.js'
 
 export class Host {
@@ -62,7 +64,14 @@ export class Host {
 	async _eval(sub) {
 		const def = this.feedbackDefs[sub.feedbackId]
 		this.fbValues[sub.id] = await def.callback(
-			{ type: def.type, id: sub.id, controlId: `ctl-${sub.id}`, feedbackId: sub.feedbackId, options: sub.options, previousOptions: null },
+			{
+				type: def.type,
+				id: sub.id,
+				controlId: `ctl-${sub.id}`,
+				feedbackId: sub.feedbackId,
+				options: sub.options,
+				previousOptions: null,
+			},
 			{ signal: new AbortController().signal },
 		)
 	}

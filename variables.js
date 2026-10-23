@@ -13,11 +13,15 @@ const definitions = {
 	iris_mode: { name: 'IRIS mode (REMOTE / AUTO)' },
 	iris_follow: { name: 'Lens iris position, raw 0 (open) .. 65535 (closed)' },
 	iris_follow_pct: { name: 'Lens iris position, % open (NO LENS if unplugged)' },
-	iris_fstop: { name: 'Lens aperture as the f-number only, e.g. "2.8" (CLOSED / NO LENS / ?). Add the "f/" in your button text.' },
+	iris_fstop: {
+		name: 'Lens aperture as the f-number only, e.g. "2.8" (CLOSED / NO LENS / ?). Add the "f/" in your button text.',
+	},
 	master_black: { name: 'Master black, signed -128..127 (mode 2B)' },
 	extender: { name: 'Lens extender (x1 / x2 / x0.8), read only' },
 	cam_alarm: { name: 'Camera head alarm (OK / HEAD FAN / HEAD TEMP), read only' },
-	fiber_link: { name: 'Fiber link to the camera head (OK / PARTIAL / CHANGING / DOWN), read only; decoded from captures, not in the Hitachi PDF' },
+	fiber_link: {
+		name: 'Fiber link to the camera head (OK / PARTIAL / CHANGING / DOWN), read only; decoded from captures, not in the Hitachi PDF',
+	},
 	fiber_raw: { name: 'Fiber link raw bytes as hex, mode 50 then status 0F (e.g. 11/00 OK, 10/00 partial, 80/20 down)' },
 	auto_result: { name: 'Result of the last auto white / auto black (OK, LOW LIGHT, ...; - if none yet)' },
 }
@@ -132,4 +136,17 @@ function valuesFromState(s) {
 export default function updateVariableDefinitions(self) {
 	self.setVariableDefinitions(definitions)
 }
-export { valuesFromState, definitions, fstopFromFollow, fstopNumber, irisLabel, irisGaugePct, blackLabel, extenderText, alarmText, fiberText, fiberRaw, autoResultText }
+export {
+	valuesFromState,
+	definitions,
+	fstopFromFollow,
+	fstopNumber,
+	irisLabel,
+	irisGaugePct,
+	blackLabel,
+	extenderText,
+	alarmText,
+	fiberText,
+	fiberRaw,
+	autoResultText,
+}

@@ -261,7 +261,8 @@ class CcuClient extends EventEmitter {
 	async _runFstop(job) {
 		try {
 			for (;;) {
-				if (this.state.irisMode !== 'REMOTE') throw new Error(`IRIS mode is ${this.state.irisMode ?? 'unknown'}, not REMOTE`)
+				if (this.state.irisMode !== 'REMOTE')
+					throw new Error(`IRIS mode is ${this.state.irisMode ?? 'unknown'}, not REMOTE`)
 				const target = job.target
 				let cmd = P.clampQuarter(this.irisCurve.cmdFor(target))
 				// A command that was already tried and did not land: nudge one quarter step toward the target instead of repeating it.
@@ -288,7 +289,8 @@ class CcuClient extends EventEmitter {
 					this.irisCurve.add(cmd, target) // good enough: remember this command for the target so a repeat is one command
 					break
 				}
-				if (job.tries >= this.opts.fstopMaxTries) throw new Error(`could not reach f/${target / 10}; lens is at f/${f / 10}`)
+				if (job.tries >= this.opts.fstopMaxTries)
+					throw new Error(`could not reach f/${target / 10}; lens is at f/${f / 10}`)
 			}
 			for (const w of job.waiters) w.resolve(job.lastF / 10)
 		} catch (e) {
@@ -308,8 +310,17 @@ class CcuClient extends EventEmitter {
 				this._fs.waiters.push({ resolve, reject })
 				return
 			}
-			if (this.state.irisMode !== 'REMOTE') return reject(new Error(`IRIS mode is ${this.state.irisMode ?? 'unknown'}, not REMOTE`))
-			this._fs = { target, tries: 0, lastCmd: null, lastF: null, prevF: null, nudge: 0.25, waiters: [{ resolve, reject }] }
+			if (this.state.irisMode !== 'REMOTE')
+				return reject(new Error(`IRIS mode is ${this.state.irisMode ?? 'unknown'}, not REMOTE`))
+			this._fs = {
+				target,
+				tries: 0,
+				lastCmd: null,
+				lastF: null,
+				prevF: null,
+				nudge: 0.25,
+				waiters: [{ resolve, reject }],
+			}
 			this._runFstop(this._fs)
 		})
 	}
@@ -325,7 +336,9 @@ class CcuClient extends EventEmitter {
 			if (base >= 0xff00) throw new Error('lens position unavailable (no lens or fully closed)')
 			return fstopTarget(stepFstopValue(base / 10, stops))
 		}
-		return this._requestFstop(() => (this._fs ? stepFrom(this._fs.target) : this._current('irisFollow', P.FRAMES.READ_IRIS_FOLLOW).then(stepFrom)))
+		return this._requestFstop(() =>
+			this._fs ? stepFrom(this._fs.target) : this._current('irisFollow', P.FRAMES.READ_IRIS_FOLLOW).then(stepFrom),
+		)
 	}
 
 	/** Auto white / auto black. Both store their result in camera memory; the reply arrives as state.autoResult. */

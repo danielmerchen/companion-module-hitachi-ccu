@@ -15,7 +15,21 @@ class Latch {
 	start(id, { label, holdMs, fire, lingerMs = null, showResult = true, doneLabel = null, doneMs = null }) {
 		if (this.entries.has(id)) return false // ignore a second press while holding / showing result
 		const startedAt = this.opts.now()
-		const entry = { id, label, holdMs, startedAt, phase: 'holding', firedAt: null, error: null, timer: null, linger: null, lingerMs, showResult, doneLabel, doneMs }
+		const entry = {
+			id,
+			label,
+			holdMs,
+			startedAt,
+			phase: 'holding',
+			firedAt: null,
+			error: null,
+			timer: null,
+			linger: null,
+			lingerMs,
+			showResult,
+			doneLabel,
+			doneMs,
+		}
 		entry.timer = setInterval(() => {
 			if (this.opts.now() - startedAt >= holdMs) this._fire(entry, fire)
 			else this.opts.onChange(id)

@@ -1,5 +1,14 @@
 import { combineRgb } from '@companion-module/base'
-import { fstopFromFollow, irisLabel, irisGaugePct, blackLabel, extenderText, alarmText, fiberText, autoResultText } from './variables.js'
+import {
+	fstopFromFollow,
+	irisLabel,
+	irisGaugePct,
+	blackLabel,
+	extenderText,
+	alarmText,
+	fiberText,
+	autoResultText,
+} from './variables.js'
 import { progressFill } from './png.js'
 
 const OPS = {
@@ -120,7 +129,8 @@ export default function updateFeedbacks(self) {
 			description: 'Uses the lens wide-open / smallest f-stop from the connection settings',
 			type: 'value',
 			options: [],
-			callback: () => irisGaugePct(st().irisFollow, Number(self.config?.fstopWide) || 1.8, Number(self.config?.fstopClosed) || 22),
+			callback: () =>
+				irisGaugePct(st().irisFollow, Number(self.config?.fstopWide) || 1.8, Number(self.config?.fstopClosed) || 22),
 		},
 		val_iris_label: {
 			name: 'Value: iris as text ("f/5.6", CLOSED, NO LENS, ?)',
@@ -144,7 +154,10 @@ export default function updateFeedbacks(self) {
 			name: 'Value: connection as text (CONNECTED / NO REPLY / ...)',
 			type: 'value',
 			options: [],
-			callback: () => ({ connected: 'CONNECTED', connecting: 'CONNECTING', no_reply: 'NO REPLY', disconnected: 'DISCONNECTED' })[st().link] ?? 'DISCONNECTED',
+			callback: () =>
+				({ connected: 'CONNECTED', connecting: 'CONNECTING', no_reply: 'NO REPLY', disconnected: 'DISCONNECTED' })[
+					st().link
+				] ?? 'DISCONNECTED',
 		},
 		val_power_label: {
 			name: 'Value: camera power as text (ON / OFF / ?)',
@@ -183,7 +196,8 @@ export default function updateFeedbacks(self) {
 		},
 		fiber_is: {
 			name: 'Fiber link is',
-			description: 'Fiber link to the camera head as reported by the CCU (decoded from captures; not in the Hitachi PDF)',
+			description:
+				'Fiber link to the camera head as reported by the CCU (decoded from captures; not in the Hitachi PDF)',
 			type: 'boolean',
 			defaultStyle: { bgcolor: combineRgb(200, 0, 0), color: combineRgb(255, 255, 255) },
 			options: [
@@ -212,7 +226,8 @@ export default function updateFeedbacks(self) {
 				const f = fiberText(st().fiberBits, st().linkStatus)
 				const out = { text: `${fb.options.label}\n${f}` }
 				if (f === 'DOWN') Object.assign(out, { bgcolor: combineRgb(200, 0, 0), color: combineRgb(255, 255, 255) })
-				else if (f === 'PARTIAL' || f === 'CHANGING') Object.assign(out, { bgcolor: combineRgb(200, 120, 0), color: combineRgb(0, 0, 0) })
+				else if (f === 'PARTIAL' || f === 'CHANGING')
+					Object.assign(out, { bgcolor: combineRgb(200, 120, 0), color: combineRgb(0, 0, 0) })
 				return out
 			},
 		},
@@ -251,13 +266,15 @@ export default function updateFeedbacks(self) {
 			callback: (fb) => {
 				const a = st().camAlarm
 				const out = { text: `${fb.options.label}\n${alarmText(a)}` }
-				if (a !== null && a !== undefined && a !== 0) Object.assign(out, { bgcolor: combineRgb(200, 0, 0), color: combineRgb(255, 255, 255) })
+				if (a !== null && a !== undefined && a !== 0)
+					Object.assign(out, { bgcolor: combineRgb(200, 0, 0), color: combineRgb(255, 255, 255) })
 				return out
 			},
 		},
 		auto_hold: {
 			name: 'Press-and-hold progress (auto functions)',
-			description: 'Fill + countdown while the button is held, then SENT and the camera result. Add to every auto-function button.',
+			description:
+				'Fill + countdown while the button is held, then SENT and the camera result. Add to every auto-function button.',
 			type: 'advanced',
 			affectedProperties: ['text', 'color', 'bgcolor', 'png64'],
 			options: [],
@@ -276,7 +293,11 @@ export default function updateFeedbacks(self) {
 				if (l.phase === 'error') return { text: `${l.label}\nFAILED`, color: white, bgcolor: combineRgb(170, 0, 0) }
 				const r = l.showResult ? st().autoResult : null
 				if (r && r.at >= l.firedAt) {
-					return { text: `${l.label}\n${autoResultText(r)}`, color: white, bgcolor: r.code === 0 ? combineRgb(0, 140, 0) : combineRgb(170, 0, 0) }
+					return {
+						text: `${l.label}\n${autoResultText(r)}`,
+						color: white,
+						bgcolor: r.code === 0 ? combineRgb(0, 140, 0) : combineRgb(170, 0, 0),
+					}
 				}
 				return { text: `${l.label}\nSENT`, color: white, bgcolor: combineRgb(0, 90, 140) }
 			},

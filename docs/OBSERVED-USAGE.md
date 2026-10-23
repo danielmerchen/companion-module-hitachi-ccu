@@ -66,8 +66,8 @@ before every analog set. On/off writes (power, bars) needed no claim. HW.
   range, measured by sweeping the RCP and reading the position at each marked stop. HW.
 
 | f-number | 1.8 | 2.0 | 2.8 | 4.0 | 5.0 | 7.0 | 9.0 | 10.0 | 16.0 | 22.0 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| position | 18 | 20 | 28 | 40 | 50 | 70 | 90 | 100 | 160 | 220 |
+| -------- | --- | --- | --- | --- | --- | --- | --- | ---- | ---- | ---- |
+| position | 18  | 20  | 28  | 40  | 50  | 70  | 90  | 100  | 160  | 220  |
 
 - `FFFF` is the fully-closed limit (one step past the last marked stop) and `FF00` means no lens. `FFFF` also appeared
   momentarily at the closed end of fast sweeps before the position read back a real value, so only trust it once it persists. HW.
@@ -89,12 +89,12 @@ The CCU reports the link two ways: **on/off mode `50`** (`23 50` -> `22 50 xx`) 
 Both can be read on demand and are also pushed on change (`12 0F` also arrives about every 2.7 s). Neither is in the DK-H200
 list. HW.
 
-| Condition | `22 50` | `12 0F` |
-| --- | --- | --- |
-| Both strands, healthy | `11` | `00` |
-| One half up | `10` | `00` |
-| Link down (one strand alone in some tests, or none) | `80` | `20` |
-| Losing the link | `40` (and `81`/`41`) | `10` |
+| Condition                                           | `22 50`              | `12 0F` |
+| --------------------------------------------------- | -------------------- | ------- |
+| Both strands, healthy                               | `11`                 | `00`    |
+| One half up                                         | `10`                 | `00`    |
+| Link down (one strand alone in some tests, or none) | `80`                 | `20`    |
+| Losing the link                                     | `40` (and `81`/`41`) | `10`    |
 
 Timelines (relative, from the captures):
 

@@ -40,13 +40,13 @@ directly is much faster than clicking, and stable.
   returns the new controlId) with any simple module preset, then rewrite it. Cheap base presets: Hitachi `fstop_4`,
   Panasonic `exposure-iris-up`.
 - Reading a button: `controls.watchControl {controlId}` -> `config:{type:'button-layered', style:{layers[]}, feedbacks[],
-  steps:{'0':{action_sets:{down:[],up:[],<ms>:[]}, options}}, localVariables}`. Option values are `{isExpression,value}`.
+steps:{'0':{action_sets:{down:[],up:[],<ms>:[]}, options}}, localVariables}`. Option values are `{isExpression,value}`.
 - Style (layered buttons): `controls.styles.updateOption {controlId,elementId,key,value:{isExpression:false,value}}`.
   Layers: `canvas` (decoration key: `none` removes the yellow location strip), `box0`, `image0`, `text0`; extra layers via
   `controls.styles.addElement {controlId,type:'text'|'image'|...,index:null}` then read the new layer id from the config.
   Text `fontsize` is % of element height (use ~42 for a half-height header, ~78 for one big line, 80 for arrows); `fontsizeAllowShrink:true`.
 - Actions: `controls.entities.add {controlId,entityLocation:{stepId:'0',setId:'down'|'up'|<ms number>},ownerId:null,connectionId,
-  entityType:'action',entityDefinition:'<actionId>'}` -> returns the entity id (string). `connectionId:'internal'` for Companion
+entityType:'action',entityDefinition:'<actionId>'}` -> returns the entity id (string). `connectionId:'internal'` for Companion
   internal actions (e.g. `custom_variable_set_value`, options `name`,`value`). `.remove {controlId,entityLocation,entityId}`,
   `.setOption {controlId,entityLocation,entityId,key,value:{isExpression,value}}`.
 - Timed (long-press) action sets: `controls.actionSets.add {controlId,stepId:'0'}` creates set `1000`;
@@ -55,8 +55,8 @@ directly is much faster than clicking, and stable.
   release after the hold time and the short `up` set does NOT run in that case (verified), so put "cancel" in both.
 - Feedbacks: `controls.entities.add` with `entityLocation:'feedbacks'`, `entityType:'feedback'`; style overrides for layered buttons via
   `controls.entities.replaceStyleOverride {controlId,entityLocation:'feedbacks',entityId,override:{overrideId:<random 20 chars>,
-  elementId:'text0',elementProperty:'text',override:{isExpression:false,value:'text'}}}`. For **advanced** module feedbacks the
-  override value is the *name of the returned property* (`'text'`,`'color'`,`'png64'`,`'bgcolor'`) mapped onto
+elementId:'text0',elementProperty:'text',override:{isExpression:false,value:'text'}}}`. For **advanced** module feedbacks the
+  override value is the _name of the returned property_ (`'text'`,`'color'`,`'png64'`,`'bgcolor'`) mapped onto
   `text0.text`, `text0.color`, `<image layer id>.base64Image`, `box0.color`. For **boolean** feedbacks the override is the literal value
   (e.g. `box0.color = 13135360`). Remove: `.removeStyleOverride {..., overrideId}`.
 - Custom variables: `customVariables.create {name,defaultVal:''}`, `.setPersistence {name,value:true}` (note: `value`, not `persistent`),

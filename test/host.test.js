@@ -13,11 +13,37 @@ async function boot(mockOpts = {}, cfg = {}) {
 }
 
 const EXPECTED_ACTIONS = [
-	'power_on', 'power_off', 'power_toggle', 'take',
-	'iris_set', 'iris_step', 'iris_fstop_set', 'iris_fstop_step', 'auto_hold_start', 'auto_hold_cancel', 'power_hold_start', 'preset_hold_start', 'master_black_set', 'master_black_step', 'refresh',
+	'power_on',
+	'power_off',
+	'power_toggle',
+	'take',
+	'iris_set',
+	'iris_step',
+	'iris_fstop_set',
+	'iris_fstop_step',
+	'auto_hold_start',
+	'auto_hold_cancel',
+	'power_hold_start',
+	'preset_hold_start',
+	'master_black_set',
+	'master_black_step',
+	'refresh',
 ]
 const EXPECTED_VARS = [
-	'link_status', 'power', 'iris', 'iris_pct', 'iris_mode', 'iris_follow', 'iris_follow_pct', 'iris_fstop', 'master_black', 'extender', 'cam_alarm', 'fiber_link', 'fiber_raw', 'auto_result',
+	'link_status',
+	'power',
+	'iris',
+	'iris_pct',
+	'iris_mode',
+	'iris_follow',
+	'iris_follow_pct',
+	'iris_fstop',
+	'master_black',
+	'extender',
+	'cam_alarm',
+	'fiber_link',
+	'fiber_raw',
+	'auto_result',
 ]
 
 test('module registers, declares actions/variables/feedbacks/presets, and reports Ok', { timeout: 15000 }, async () => {
@@ -30,8 +56,22 @@ test('module registers, declares actions/variables/feedbacks/presets, and report
 	assert.deepEqual([...vars].sort(), [...EXPECTED_VARS].sort())
 	const feedbacks = Object.keys(host.feedbackDefs)
 	for (const f of [
-		'power_state', 'link_ok', 'iris_mode_is', 'iris_compare', 'master_black_compare',
-		'iris_text', 'master_black_text', 'iris_fstop_text', 'alarm_active', 'extender_is', 'extender_text', 'cam_alarm_text', 'fiber_is', 'fiber_text', 'auto_hold', 'preset_hold',
+		'power_state',
+		'link_ok',
+		'iris_mode_is',
+		'iris_compare',
+		'master_black_compare',
+		'iris_text',
+		'master_black_text',
+		'iris_fstop_text',
+		'alarm_active',
+		'extender_is',
+		'extender_text',
+		'cam_alarm_text',
+		'fiber_is',
+		'fiber_text',
+		'auto_hold',
+		'preset_hold',
 	])
 		assert.ok(feedbacks.includes(f), `feedback ${f} declared`)
 
@@ -40,7 +80,10 @@ test('module registers, declares actions/variables/feedbacks/presets, and report
 	assert.ok(ids.length >= 12)
 	for (const sec of host.structure) {
 		for (const title of [sec.name, ...sec.definitions.map((g) => g.name)])
-			assert.ok(title.split(' ').every((w) => /^[A-Z]/.test(w)), `section title "${title}" is Title Case`)
+			assert.ok(
+				title.split(' ').every((w) => /^[A-Z]/.test(w)),
+				`section title "${title}" is Title Case`,
+			)
 	}
 	const listed = host.structure.flatMap((sec) => sec.definitions.flatMap((g) => g.presets))
 	assert.deepEqual([...listed].sort(), [...ids].sort(), 'every preset appears exactly once in the structure')
@@ -73,20 +116,32 @@ test('module registers, declares actions/variables/feedbacks/presets, and report
 		const locals = Object.fromEntries((p.localVariables ?? []).map((l) => [l.variableName, l]))
 		for (const l of Object.values(locals)) {
 			assert.equal(l.variableType, 'feedback', `${id}.${l.variableName}`)
-			assert.equal(host.feedbackDefs[l.feedbackId]?.type, 'value', `${id}.${l.variableName} is driven by a value feedback`)
+			assert.equal(
+				host.feedbackDefs[l.feedbackId]?.type,
+				'value',
+				`${id}.${l.variableName} is driven by a value feedback`,
+			)
 		}
 		for (const ref of localRefs(p.elements)) assert.ok(locals[ref], `${id}: $(local:${ref}) is declared`)
 		for (const l of Object.keys(locals)) assert.ok(localRefs(p.elements).includes(l), `${id}: local ${l} is used`)
-		for (const f of p.feedbacks) for (const o of f.styleOverrides) assert.ok(ids2.includes(o.elementId), `${id}: override targets ${o.elementId}`)
+		for (const f of p.feedbacks)
+			for (const o of f.styleOverrides) assert.ok(ids2.includes(o.elementId), `${id}: override targets ${o.elementId}`)
 		// fontsize is a percentage of the text element's height: anything small renders tiny (a bug we shipped once).
 		for (const e of p.elements.filter((x) => x.type === 'text')) {
-			assert.ok(e.fontsize >= 60 && e.fontsize <= 200, `${id}: text ${e.id} fontsize ${e.fontsize} should be 60-200 (% of element height)`)
+			assert.ok(
+				e.fontsize >= 60 && e.fontsize <= 200,
+				`${id}: text ${e.id} fontsize ${e.fontsize} should be 60-200 (% of element height)`,
+			)
 			assert.equal(e.fontsizeAllowShrink, true, `${id}: text ${e.id} must shrink to fit`)
 		}
 		// Per Companion: symmetric = fill grows OUTWARD both ways from the origin (stereo width); a bipolar value like master black wants false.
 		for (const e of p.elements.filter((x) => x.type === 'gauge' && x.origin !== undefined))
-			assert.ok(e.origin >= e.min && e.origin <= e.max && e.symmetric === false, `${id}: bipolar gauge ${e.id} must grow from the origin (symmetric: false)`)
-		for (const e of p.elements.filter((x) => x.type === 'gauge')) assert.ok(e.min < e.max && e.value?.isExpression, `${id}: gauge ${e.id} has a range and a bound value`)
+			assert.ok(
+				e.origin >= e.min && e.origin <= e.max && e.symmetric === false,
+				`${id}: bipolar gauge ${e.id} must grow from the origin (symmetric: false)`,
+			)
+		for (const e of p.elements.filter((x) => x.type === 'gauge'))
+			assert.ok(e.min < e.max && e.value?.isExpression, `${id}: gauge ${e.id} has a range and a bound value`)
 	}
 	// StreamDeck+ knobs: turning steps, pushing resets.
 	const knobs = ids.filter((i) => i.startsWith('knob_'))
@@ -100,20 +155,27 @@ test('module registers, declares actions/variables/feedbacks/presets, and report
 	await done()
 })
 
-test('variables are filled from the CCU readback (power, IRIS, Master Black, lens position)', { timeout: 15000 }, async () => {
-	const { host, done } = await boot()
-	await waitFor(() => host.vars.iris_follow === 61)
-	assert.equal(host.vars.link_status, 'Connected')
-	assert.equal(host.vars.power, 'ON')
-	assert.equal(host.vars.iris, 0)
-	assert.equal(host.vars.iris_pct, 50)
-	assert.equal(host.vars.iris_mode, 'REMOTE')
-	assert.equal(host.vars.master_black, -13)
-	assert.equal(host.vars.iris_follow_pct, 100)
-	assert.equal(host.vars.iris_fstop, '6.1')
-	assert.deepEqual(host.logs.filter((l) => l.level === 'error'), [])
-	await done()
-})
+test(
+	'variables are filled from the CCU readback (power, IRIS, Master Black, lens position)',
+	{ timeout: 15000 },
+	async () => {
+		const { host, done } = await boot()
+		await waitFor(() => host.vars.iris_follow === 61)
+		assert.equal(host.vars.link_status, 'Connected')
+		assert.equal(host.vars.power, 'ON')
+		assert.equal(host.vars.iris, 0)
+		assert.equal(host.vars.iris_pct, 50)
+		assert.equal(host.vars.iris_mode, 'REMOTE')
+		assert.equal(host.vars.master_black, -13)
+		assert.equal(host.vars.iris_follow_pct, 100)
+		assert.equal(host.vars.iris_fstop, '6.1')
+		assert.deepEqual(
+			host.logs.filter((l) => l.level === 'error'),
+			[],
+		)
+		await done()
+	},
+)
 
 test('feedbacks evaluate correctly and update when values change', { timeout: 15000 }, async () => {
 	const { host, ccu, done } = await boot()
@@ -148,35 +210,42 @@ test('feedbacks evaluate correctly and update when values change', { timeout: 15
 	await done()
 })
 
-test('actions: power, set and step IRIS / Master Black reach the CCU and update readbacks', { timeout: 20000 }, async () => {
-	const { host, ccu, done } = await boot()
-	await waitFor(() => host.vars.power === 'ON' && host.vars.iris === 0)
-	await host.subscribeFeedbacks([['f_on', 'power_state', { state: 'on' }]])
-	await waitFor(() => host.fbValues.f_on === true)
+test(
+	'actions: power, set and step IRIS / Master Black reach the CCU and update readbacks',
+	{ timeout: 20000 },
+	async () => {
+		const { host, ccu, done } = await boot()
+		await waitFor(() => host.vars.power === 'ON' && host.vars.iris === 0)
+		await host.subscribeFeedbacks([['f_on', 'power_state', { state: 'on' }]])
+		await waitFor(() => host.fbValues.f_on === true)
 
-	let r = await host.execute('power_off')
-	assert.ok(r.ok)
-	await waitFor(() => ccu.count([0x20, 0x22, 0x00, 0xfe]) === 1)
-	await waitFor(() => host.vars.power === 'OFF')
-	await waitFor(() => host.fbValues.f_on === false) // feedback follows the readback
+		let r = await host.execute('power_off')
+		assert.ok(r.ok)
+		await waitFor(() => ccu.count([0x20, 0x22, 0x00, 0xfe]) === 1)
+		await waitFor(() => host.vars.power === 'OFF')
+		await waitFor(() => host.fbValues.f_on === false) // feedback follows the readback
 
-	r = await host.execute('iris_set', { value: 25 })
-	assert.ok(r.ok)
-	await waitFor(() => ccu.state.iris === 25 && host.vars.iris === 25)
-	assert.equal(host.vars.iris_pct, Math.round((153 / 255) * 100))
+		r = await host.execute('iris_set', { value: 25 })
+		assert.ok(r.ok)
+		await waitFor(() => ccu.state.iris === 25 && host.vars.iris === 25)
+		assert.equal(host.vars.iris_pct, Math.round((153 / 255) * 100))
 
-	await host.execute('master_black_step', { delta: -3 })
-	await waitFor(() => ccu.state.masterBlack === -16 && host.vars.master_black === -16)
+		await host.execute('master_black_step', { delta: -3 })
+		await waitFor(() => ccu.state.masterBlack === -16 && host.vars.master_black === -16)
 
-	await host.execute('iris_step', { delta: 4 })
-	await host.execute('iris_step', { delta: 4 }) // rapid presses accumulate
-	await waitFor(() => ccu.state.iris === 33 && host.vars.iris === 33)
+		await host.execute('iris_step', { delta: 4 })
+		await host.execute('iris_step', { delta: 4 }) // rapid presses accumulate
+		await waitFor(() => ccu.state.iris === 33 && host.vars.iris === 33)
 
-	await host.execute('take')
-	await waitFor(() => ccu.count([0x08, 0x00, 0xff]) === 1)
-	assert.deepEqual(host.logs.filter((l) => l.level === 'error'), [])
-	await done()
-})
+		await host.execute('take')
+		await waitFor(() => ccu.count([0x08, 0x00, 0xff]) === 1)
+		assert.deepEqual(
+			host.logs.filter((l) => l.level === 'error'),
+			[],
+		)
+		await done()
+	},
+)
 
 test('extender / alarm variables and feedbacks', { timeout: 15000 }, async () => {
 	const { host, ccu, done } = await boot({ state: { extender: 1, camAlarm: 0 } })
@@ -198,59 +267,84 @@ test('extender / alarm variables and feedbacks', { timeout: 15000 }, async () =>
 	await done()
 })
 
-test('auto function needs a full 5 s hold: early release sends nothing, full hold sends once and shows the result', { timeout: 30000 }, async () => {
-	const { host, ccu, done } = await boot()
-	await waitFor(() => host.vars.power === 'ON')
-	await host.subscribeFeedbacks([['f_hold', 'auto_hold', {}]])
-	await waitFor(() => 'f_hold' in host.fbValues)
-	assert.deepEqual(host.fbValues.f_hold, {})
+test(
+	'auto function needs a full 5 s hold: early release sends nothing, full hold sends once and shows the result',
+	{ timeout: 30000 },
+	async () => {
+		const { host, ccu, done } = await boot()
+		await waitFor(() => host.vars.power === 'ON')
+		await host.subscribeFeedbacks([['f_hold', 'auto_hold', {}]])
+		await waitFor(() => 'f_hold' in host.fbValues)
+		assert.deepEqual(host.fbValues.f_hold, {})
 
-	await host.execute('auto_hold_start', { fn: 'awb', holdSeconds: 5 }, 'ctl-f_hold')
-	await waitFor(() => host.fbValues.f_hold?.text?.includes('HOLD'))
-	assert.ok(host.fbValues.f_hold.png64, 'progress fill is drawn while holding')
-	await sleep(1500)
-	await host.execute('auto_hold_cancel', {}, 'ctl-f_hold')
-	await waitFor(() => Object.keys(host.fbValues.f_hold).length === 0)
-	await sleep(4500)
-	assert.equal(ccu.count([0x40, 0x10]), 0, 'released early: nothing sent')
+		await host.execute('auto_hold_start', { fn: 'awb', holdSeconds: 5 }, 'ctl-f_hold')
+		await waitFor(() => host.fbValues.f_hold?.text?.includes('HOLD'))
+		assert.ok(host.fbValues.f_hold.png64, 'progress fill is drawn while holding')
+		await sleep(1500)
+		await host.execute('auto_hold_cancel', {}, 'ctl-f_hold')
+		await waitFor(() => Object.keys(host.fbValues.f_hold).length === 0)
+		await sleep(4500)
+		assert.equal(ccu.count([0x40, 0x10]), 0, 'released early: nothing sent')
 
-	await host.execute('auto_hold_start', { fn: 'awb', holdSeconds: 1 }, 'ctl-f_hold') // enforced minimum is 5 s
-	await sleep(3000)
-	assert.equal(ccu.count([0x40, 0x10]), 0, 'minimum hold time is enforced even if configured lower')
-	await waitFor(() => ccu.count([0x40, 0x10]) === 1, 6000)
-	await waitFor(() => host.vars.auto_result === 'OK')
-	await waitFor(() => host.fbValues.f_hold?.text === 'AUTO\nWHITE\nOK')
-	await host.execute('auto_hold_cancel', {}, 'ctl-f_hold') // release after firing is a no-op
-	assert.equal(ccu.count([0x40, 0x10]), 1)
-	await done()
-})
+		await host.execute('auto_hold_start', { fn: 'awb', holdSeconds: 1 }, 'ctl-f_hold') // enforced minimum is 5 s
+		await sleep(3000)
+		assert.equal(ccu.count([0x40, 0x10]), 0, 'minimum hold time is enforced even if configured lower')
+		await waitFor(() => ccu.count([0x40, 0x10]) === 1, 6000)
+		await waitFor(() => host.vars.auto_result === 'OK')
+		await waitFor(() => host.fbValues.f_hold?.text === 'AUTO\nWHITE\nOK')
+		await host.execute('auto_hold_cancel', {}, 'ctl-f_hold') // release after firing is a no-op
+		assert.equal(ccu.count([0x40, 0x10]), 1)
+		await done()
+	},
+)
 
-test('v2 definition hygiene: required fields present on every action, feedback and variable', { timeout: 15000 }, async () => {
-	const { host, ccu, done } = await boot()
-	await waitFor(() => host.status?.status === 'ok')
-	for (const [id, def] of Object.entries(host.actions)) {
-		assert.ok(def.name && typeof def.callback === 'function' && Array.isArray(def.options), `action ${id}`)
-		for (const o of def.options) if (o.type === 'number') assert.ok('min' in o && 'max' in o && 'default' in o, `${id}.${o.id} number needs min/max/default`)
-	}
-	for (const [id, def] of Object.entries(host.feedbackDefs)) {
-		assert.ok(def.name && typeof def.callback === 'function', `feedback ${id}`)
-		if (def.type === 'boolean') assert.ok(def.defaultStyle, `${id} needs defaultStyle`)
-		if (def.type === 'advanced') assert.ok(Array.isArray(def.affectedProperties) && def.affectedProperties.length, `${id} needs affectedProperties`)
-		for (const o of def.options) if (o.type === 'number') assert.ok('min' in o && 'max' in o, `${id}.${o.id} number needs min/max`)
-	}
-	for (const [id, def] of Object.entries(host.varDefs)) assert.ok(def.name, `variable ${id}`)
-	await waitFor(() => Object.keys(host.varDefs).every((v) => host.vars[v] !== undefined))
-	const fields = host.instance.getConfigFields()
-	assert.ok(fields.every((f) => f.id && f.type && f.label && f.width), 'config fields complete')
-	await done()
-})
+test(
+	'v2 definition hygiene: required fields present on every action, feedback and variable',
+	{ timeout: 15000 },
+	async () => {
+		const { host, done } = await boot()
+		await waitFor(() => host.status?.status === 'ok')
+		for (const [id, def] of Object.entries(host.actions)) {
+			assert.ok(def.name && typeof def.callback === 'function' && Array.isArray(def.options), `action ${id}`)
+			for (const o of def.options)
+				if (o.type === 'number')
+					assert.ok('min' in o && 'max' in o && 'default' in o, `${id}.${o.id} number needs min/max/default`)
+		}
+		for (const [id, def] of Object.entries(host.feedbackDefs)) {
+			assert.ok(def.name && typeof def.callback === 'function', `feedback ${id}`)
+			if (def.type === 'boolean') assert.ok(def.defaultStyle, `${id} needs defaultStyle`)
+			if (def.type === 'advanced')
+				assert.ok(
+					Array.isArray(def.affectedProperties) && def.affectedProperties.length,
+					`${id} needs affectedProperties`,
+				)
+			for (const o of def.options)
+				if (o.type === 'number') assert.ok('min' in o && 'max' in o, `${id}.${o.id} number needs min/max`)
+		}
+		for (const [id, def] of Object.entries(host.varDefs)) assert.ok(def.name, `variable ${id}`)
+		await waitFor(() => Object.keys(host.varDefs).every((v) => host.vars[v] !== undefined))
+		const fields = host.instance.getConfigFields()
+		assert.ok(
+			fields.every((f) => f.id && f.type && f.label && f.width),
+			'config fields complete',
+		)
+		await done()
+	},
+)
 
 test('value feedbacks feed the gauges and labels, and follow the camera', { timeout: 15000 }, async () => {
 	const { host, ccu, done } = await boot()
 	await waitFor(() => host.vars.iris_follow === 61 && host.vars.master_black === -13)
 	await host.subscribeFeedbacks([
-		['g', 'val_iris_gauge', {}], ['gl', 'val_iris_label', {}], ['b', 'val_black', {}], ['bl', 'val_black_label', {}],
-		['lk', 'val_link_label', {}], ['pw', 'val_power_label', {}], ['md', 'val_iris_mode_label', {}], ['ln', 'val_lens_label', {}], ['au', 'val_auto_label', {}],
+		['g', 'val_iris_gauge', {}],
+		['gl', 'val_iris_label', {}],
+		['b', 'val_black', {}],
+		['bl', 'val_black_label', {}],
+		['lk', 'val_link_label', {}],
+		['pw', 'val_power_label', {}],
+		['md', 'val_iris_mode_label', {}],
+		['ln', 'val_lens_label', {}],
+		['au', 'val_auto_label', {}],
 	])
 	const v = host.fbValues
 	assert.deepEqual([v.g, v.gl, v.b, v.bl], [51, 'f/6.1', -13, '-13'])
@@ -262,41 +356,49 @@ test('value feedbacks feed the gauges and labels, and follow the camera', { time
 	await done()
 })
 
-test('power hold: early release sends nothing; a full hold powers the camera once, shows SENT, then clears', { timeout: 20000 }, async () => {
-	const { host, ccu, done } = await boot()
-	await waitFor(() => host.vars.power === 'ON')
-	await host.subscribeFeedbacks([['f_hold', 'auto_hold', {}]])
-	await waitFor(() => 'f_hold' in host.fbValues)
+test(
+	'power hold: early release sends nothing; a full hold powers the camera once, shows SENT, then clears',
+	{ timeout: 20000 },
+	async () => {
+		const { host, ccu, done } = await boot()
+		await waitFor(() => host.vars.power === 'ON')
+		await host.subscribeFeedbacks([['f_hold', 'auto_hold', {}]])
+		await waitFor(() => 'f_hold' in host.fbValues)
 
-	await host.execute('power_hold_start', { state: 'off', holdSeconds: 2 }, 'ctl-f_hold')
-	await waitFor(() => host.fbValues.f_hold?.text?.includes('HOLD'))
-	assert.ok(host.fbValues.f_hold.png64, 'progress animation while holding')
-	await sleep(700)
-	await host.execute('auto_hold_cancel', {}, 'ctl-f_hold')
-	await waitFor(() => Object.keys(host.fbValues.f_hold).length === 0)
-	await sleep(2500)
-	assert.equal(ccu.count([0x20, 0x22, 0x00, 0xfe]), 0, 'released early: camera untouched')
+		await host.execute('power_hold_start', { state: 'off', holdSeconds: 2 }, 'ctl-f_hold')
+		await waitFor(() => host.fbValues.f_hold?.text?.includes('HOLD'))
+		assert.ok(host.fbValues.f_hold.png64, 'progress animation while holding')
+		await sleep(700)
+		await host.execute('auto_hold_cancel', {}, 'ctl-f_hold')
+		await waitFor(() => Object.keys(host.fbValues.f_hold).length === 0)
+		await sleep(2500)
+		assert.equal(ccu.count([0x20, 0x22, 0x00, 0xfe]), 0, 'released early: camera untouched')
 
-	await host.execute('power_hold_start', { state: 'off', holdSeconds: 1, label: 'ALL CAMS\\nOFF' }, 'ctl-f_hold')
-	await waitFor(() => ccu.count([0x20, 0x22, 0x00, 0xfe]) === 1, 4000)
-	await waitFor(() => host.fbValues.f_hold?.text === 'ALL CAMS\nOFF\nSENT') // custom label, \\n becomes a line break
-	await waitFor(() => host.vars.power === 'OFF')
-	await waitFor(() => Object.keys(host.fbValues.f_hold).length === 0, 6000) // clears by itself (no auto-result to wait for)
-	assert.equal(ccu.count([0x20, 0x22, 0x00, 0xfe]), 1)
-	await done()
-})
+		await host.execute('power_hold_start', { state: 'off', holdSeconds: 1, label: 'ALL CAMS\\nOFF' }, 'ctl-f_hold')
+		await waitFor(() => ccu.count([0x20, 0x22, 0x00, 0xfe]) === 1, 4000)
+		await waitFor(() => host.fbValues.f_hold?.text === 'ALL CAMS\nOFF\nSENT') // custom label, \\n becomes a line break
+		await waitFor(() => host.vars.power === 'OFF')
+		await waitFor(() => Object.keys(host.fbValues.f_hold).length === 0, 6000) // clears by itself (no auto-result to wait for)
+		assert.equal(ccu.count([0x20, 0x22, 0x00, 0xfe]), 1)
+		await done()
+	},
+)
 
-test('power hold TOGGLE flips the camera at the moment the hold completes, in either direction', { timeout: 20000 }, async () => {
-	const { host, ccu, done } = await boot()
-	await waitFor(() => host.vars.power === 'ON')
-	await host.execute('power_hold_start', { state: 'toggle', holdSeconds: 1 }, 'ctl-a')
-	await waitFor(() => ccu.count([0x20, 0x22, 0x00, 0xfe]) === 1, 4000) // was on -> off
-	await waitFor(() => host.vars.power === 'OFF')
-	await sleep(3300) // let the previous hold's SENT state clear
-	await host.execute('power_hold_start', { state: 'toggle', holdSeconds: 1 }, 'ctl-a')
-	await waitFor(() => ccu.count([0x20, 0x22, 0x01, 0xfe]) === 1, 4000) // was off -> on
-	await done()
-})
+test(
+	'power hold TOGGLE flips the camera at the moment the hold completes, in either direction',
+	{ timeout: 20000 },
+	async () => {
+		const { host, ccu, done } = await boot()
+		await waitFor(() => host.vars.power === 'ON')
+		await host.execute('power_hold_start', { state: 'toggle', holdSeconds: 1 }, 'ctl-a')
+		await waitFor(() => ccu.count([0x20, 0x22, 0x00, 0xfe]) === 1, 4000) // was on -> off
+		await waitFor(() => host.vars.power === 'OFF')
+		await sleep(3300) // let the previous hold's SENT state clear
+		await host.execute('power_hold_start', { state: 'toggle', holdSeconds: 1 }, 'ctl-a')
+		await waitFor(() => ccu.count([0x20, 0x22, 0x01, 0xfe]) === 1, 4000) // was off -> on
+		await done()
+	},
+)
 
 test('a failing action is logged as a warning, not thrown', { timeout: 15000 }, async () => {
 	const { host, ccu, done } = await boot()
@@ -344,7 +446,10 @@ test('missing / unreachable CCU shows the right status and never crashes', { tim
 	await h2.start({ host: '127.0.0.1', port: 1, pollMs: 250 })
 	await waitFor(() => h2.status?.status === 'connection_failure')
 	assert.equal(h2.vars.link_status, 'Disconnected')
-	assert.deepEqual(h2.logs.filter((l) => l.level === 'error'), [])
+	assert.deepEqual(
+		h2.logs.filter((l) => l.level === 'error'),
+		[],
+	)
 	await h2.stop()
 })
 

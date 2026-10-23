@@ -10,7 +10,11 @@ test('latch fires only after the full hold, and only once', async () => {
 	const l = new Latch({ tickMs: 10, lingerMs: 300, onChange: (id) => changes.push(id) })
 	let fired = 0
 	assert.equal(l.start('b1', { label: 'X', holdMs: 150, fire: () => fired++ }), true)
-	assert.equal(l.start('b1', { label: 'X', holdMs: 150, fire: () => fired++ }), false, 'second press ignored while active')
+	assert.equal(
+		l.start('b1', { label: 'X', holdMs: 150, fire: () => fired++ }),
+		false,
+		'second press ignored while active',
+	)
 	await sleep(60)
 	const mid = l.get('b1')
 	assert.equal(mid.phase, 'holding')
@@ -42,7 +46,13 @@ test('latch cancel before the hold time sends nothing and leaves no timers', asy
 
 test('latch reports a failed send and buttons are independent', async () => {
 	const l = new Latch({ tickMs: 10, lingerMs: 400 })
-	l.start('a', { label: 'A', holdMs: 20, fire: () => { throw new Error('not connected to CCU') } })
+	l.start('a', {
+		label: 'A',
+		holdMs: 20,
+		fire: () => {
+			throw new Error('not connected to CCU')
+		},
+	})
 	l.start('b', { label: 'B', holdMs: 500, fire: () => {} })
 	await sleep(80)
 	assert.equal(l.get('a').phase, 'error')

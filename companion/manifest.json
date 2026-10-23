@@ -22,16 +22,7 @@
 		"entrypoint": "../main.js"
 	},
 	"manufacturer": "Hitachi",
-	"products": [
-		"Camera CCU"
-	],
-	"keywords": [
-		"camera",
-		"broadcast",
-		"CCU",
-		"RCP",
-		"iris",
-		"black"
-	],
+	"products": ["Camera CCU"],
+	"keywords": ["camera", "broadcast", "CCU", "RCP", "iris", "black"],
 	"type": "connection"
 }

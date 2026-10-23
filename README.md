@@ -9,14 +9,14 @@ using packet captures of a real RCP plus the DK-H200 command list (a sibling mod
 
 ## Features
 
-| Area | What it does | Evidence |
-| --- | --- | --- |
-| Power | on / off / toggle, readback | hardware-verified |
-| IRIS | set, step, **set to f-stop**, **step in stops**, `iris_fstop` variable | hardware-verified (f-stop = lens position / 10) |
-| Master black | set, step, readback | hardware-verified |
-| Lens extender, head alarm | read-only variables / feedbacks | request frames captured; reply meaning from the PDF |
-| Auto black | press-and-hold (5 s) latch with progress animation, result variable | capture-verified |
-| Auto white | same latch | **PDF only, not yet captured** |
+| Area                      | What it does                                                           | Evidence                                            |
+| ------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------- |
+| Power                     | on / off / toggle, readback                                            | hardware-verified                                   |
+| IRIS                      | set, step, **set to f-stop**, **step in stops**, `iris_fstop` variable | hardware-verified (f-stop = lens position / 10)     |
+| Master black              | set, step, readback                                                    | hardware-verified                                   |
+| Lens extender, head alarm | read-only variables / feedbacks                                        | request frames captured; reply meaning from the PDF |
+| Auto black                | press-and-hold (5 s) latch with progress animation, result variable    | capture-verified                                    |
+| Auto white                | same latch                                                             | **PDF only, not yet captured**                      |
 
 Presets (Companion 5 layered buttons): status buttons, IRIS + BLACK gauges, and StreamDeck+ knob presets (see [companion/HELP.md](companion/HELP.md)).
 
@@ -26,9 +26,9 @@ Usage and variables: [companion/HELP.md](companion/HELP.md).
 
 ## Which branch / version
 
-| Companion | Use | Module API |
-| --- | --- | --- |
-| 5.x | `main` (v0.7.x and later) | v2 (`@companion-module/base` ~2.1, ESM, default export) |
+| Companion | Use                       | Module API                                                                                            |
+| --------- | ------------------------- | ----------------------------------------------------------------------------------------------------- |
+| 5.x       | `main` (v0.7.x and later) | v2 (`@companion-module/base` ~2.1, ESM, default export)                                               |
 | 3.x / 4.x | branch `v1`, tag `v0.5.1` | v1 (`@companion-module/base` ~1.14). **No longer maintained**: it will not get fixes or new features. |
 
 `main` is the only maintained build. The `v1` branch is kept for reference and for Companion 3.x / 4.x installs that already use it.
@@ -38,7 +38,7 @@ Differences worth knowing: the CCU IP default is blank on `main` (it was a lab a
 ## Install
 
 **Download the `.tgz` from the [Releases](https://github.com/danielmerchen/companion-module-hitachi-ccu/releases) page** (the asset named `hitachi-ccu-<version>.tgz`),
-not GitHub's "Source code" archives: Companion only loads a *built* package, and a source archive is rejected with
+not GitHub's "Source code" archives: Companion only loads a _built_ package, and a source archive is rejected with
 `Module Api version is too new/old ... 0.0.0` because the source manifest keeps a placeholder API version that the build stamps.
 
 Download a packaged `hitachi-ccu-<version>.tgz` (or build one, below) and import it in Companion under
